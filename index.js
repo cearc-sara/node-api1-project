@@ -40,5 +40,31 @@ server.get("/api/users/:id", (req, res) => {
 })
 
 server.delete("/api/users/:id", (req, res) => {
-    
+    const id = req.params.id
+    const currentUsers = users.filter(user => user.id !== id)
+
+    if(currentUsers){
+        res.status(200).json({ data: currentUsers })
+    }else if(!currentUsers){
+        res.status(404).json({ message: "The user with the specified ID does not exist."})
+    }else{
+        res.status(500).json({ errorMessage: "The user could not be removed"})
+    }
 })
+
+server.put("/api/users/:id", (req, res) => {
+    const id = req.params.id
+    const changes = req.body
+    const found = users.find(user => user.id === id)
+
+    if(found && req.body.name && req.body.bio) {
+        Object.assign(found, changes)
+        res.status(200).json({ data: users })
+    }else{
+        res.status(400).json({ errorMessage: "Please provide name and bio for the user"})
+    }
+})
+
+const port = 5000
+
+server.listen(port, () => console.log("server running..."))
